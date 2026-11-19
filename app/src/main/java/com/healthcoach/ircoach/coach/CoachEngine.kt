@@ -1,6 +1,7 @@
 package com.healthcoach.ircoach.coach
 
 import android.content.Context
+import com.healthcoach.ircoach.BuildConfig
 import com.healthcoach.ircoach.data.Db
 import com.healthcoach.ircoach.data.FoodItem
 import com.healthcoach.ircoach.data.Settings
@@ -36,7 +37,7 @@ class CoachEngine(private val ctx: Context) {
             handleWeight(kg)
             return@synchronized
         }
-        if (settings.apiKey.isBlank()) {
+        if (settings.apiKey.isBlank() && BuildConfig.RELAY_URL.isBlank()) {
             db.addMessage("assistant", Prompts.OFFLINE_HELP)
             return@synchronized
         }
@@ -198,8 +199,7 @@ class CoachEngine(private val ctx: Context) {
     }
 
     private fun gemini(): Gemini {
-        if (settings.apiKey.isBlank()) throw CoachException("Add your free Gemini API key in Settings first.")
-        return Gemini(settings.apiKey, settings.model)
+        return Gemini(settings.apiKey, settings.model, BuildConfig.RELAY_URL, settings.deviceId)
     }
 
     private fun systemPrompt(): String = buildString {

@@ -18,8 +18,11 @@ android {
         applicationId = "com.healthcoach.ircoach"
         minSdk = 28
         targetSdk = 36
-        versionCode = 3
-        versionName = "2.1"
+        versionCode = 4
+        versionName = "3.0"
+        // URL of the Cloudflare relay that holds the shared Gemini key (not a secret). Override with -PrelayUrl=...
+        val relayUrl = (project.findProperty("relayUrl") as String?) ?: ""
+        buildConfigField("String", "RELAY_URL", "\"$relayUrl\"")
     }
 
     signingConfigs {
@@ -43,7 +46,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; buildConfig = true }
     packaging {
         resources.excludes += setOf(
             "META-INF/DEPENDENCIES", "META-INF/LICENSE*", "META-INF/NOTICE*", "META-INF/INDEX.LIST",

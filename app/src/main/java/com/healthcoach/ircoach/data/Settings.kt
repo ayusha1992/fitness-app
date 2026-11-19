@@ -57,6 +57,12 @@ class Settings(ctx: Context) {
         get() = prefs.getBoolean("setup_done", false)
         set(v) = prefs.edit().putBoolean("setup_done", v).apply()
 
+    /** Random per-install id sent to the relay (no personal data). */
+    val deviceId: String
+        get() = prefs.getString("device_id", null) ?: java.util.UUID.randomUUID().toString().also {
+            prefs.edit().putString("device_id", it).apply()
+        }
+
     fun mealReminders(): List<Pair<String, String>> =
         listOf("breakfast" to breakfastTime, "lunch" to lunchTime, "dinner" to dinnerTime)
 

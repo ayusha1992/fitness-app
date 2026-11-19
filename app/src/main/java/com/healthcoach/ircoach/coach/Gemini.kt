@@ -10,9 +10,15 @@ class CoachException(message: String, cause: Throwable? = null) : Exception(mess
 
 /**
  * Minimal client for Google's Gemini Interactions API (REST, no SDK).
- * Blocking; call from Dispatchers.IO.
+ * With a personal [apiKey] it calls Google directly; otherwise it goes through the app's relay
+ * (see relay/), which holds the shared key. Blocking; call from Dispatchers.IO.
  */
-class Gemini(private val apiKey: String, private val model: String) {
+class Gemini(
+    private val apiKey: String,
+    private val model: String,
+    private val relayUrl: String = "",
+    private val deviceId: String = "",
+) {
     sealed interface Part {
         data class Text(val text: String) : Part
         data class Image(val jpegBase64: String) : Part
@@ -35,13 +41,17 @@ class Gemini(private val apiKey: String, private val model: String) {
 
     private fun post(model: String, system: String, turns: List<Turn>, schema: Map<String, Any>?): String {
         val body = buildBody(model, system, turns, schema).toString().toByteArray()
-        val conn = (URL(ENDPOINT).openConnection() as HttpURLConnection).apply {
+        val viaRelay = apiKey.isBlank()
+        if (viaRelay && relayUrl.isBlank()) throw CoachException("Add a Gemini API key in Settings first.")
+        val endpoint = if (viaRelay) relayUrl.trimEnd('/') + "/v1/interactions" else ENDPOINT
+        val conn = (URL(endpoint).openConnection() as HttpURLConnection).apply {
             requestMethod = "POST"
             doOutput = true
             connectTimeout = 20_000
             readTimeout = 120_000
             setRequestProperty("Content-Type", "application/json")
-            setRequestProperty("x-goog-api-key", apiKey)
+            if (viaRelay) setRequestProperty("X-Device-Id", deviceId)
+            else setRequestProperty("x-goog-api-key", apiKey)
             setRequestProperty("Api-Revision", API_REVISION)
         }
         val code: Int
@@ -62,7 +72,8 @@ class Gemini(private val apiKey: String, private val model: String) {
             val msg = runCatching { JSONObject(text).getJSONObject("error").optString("message") }.getOrNull().orEmpty()
             throw CoachException(
                 when {
-                    code == 429 -> "You've hit the free Gemini limit for now (too many requests per minute or per day). Try again later."
+                    code == 429 -> msg.ifBlank { "You've hit the free Gemini limit for now. Try again later." }
+                    viaRelay && code == 502 -> "The coach's AI service is having trouble. Please try again later."
                     code == 401 || code == 403 || msg.contains("API key", ignoreCase = true) ->
                         "Your Gemini API key was rejected. Check it in Settings."
                     code == 404 -> "Gemini model \"$model\" wasn't found. Check the model name in Settings."

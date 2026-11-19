@@ -1,0 +1,15 @@
+{
+  // Cloudflare Worker that forwards the app's Gemini requests, adding the API key server-side.
+  // The key is a Worker secret (wrangler secret put GEMINI_KEY), never stored in this repo or the app.
+  "name": "ircoach-relay",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "kv_namespaces": [
+    // Daily usage counters. Fill in the id printed by: npx wrangler kv namespace create USAGE
+    { "binding": "USAGE", "id": "REPLACE_WITH_KV_ID" }
+  ],
+  "vars": {
+    "PER_IP_DAILY": "60",
+    "GLOBAL_DAILY": "400"
+  }
+}

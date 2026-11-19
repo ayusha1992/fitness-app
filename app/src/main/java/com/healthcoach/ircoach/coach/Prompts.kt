@@ -83,5 +83,5 @@ for a photo of what they ate.
 
     const val OFFLINE_HELP =
         "I can track your weight (just send a number like *72.4*) and remind you about meals. " +
-            "To check meal photos and answer questions, add your free Gemini API key in *Settings*."
+            "Meal-photo checks and questions aren't available in this build."
 }

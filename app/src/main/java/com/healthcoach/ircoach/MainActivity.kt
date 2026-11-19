@@ -4,12 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
@@ -17,12 +18,15 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.healthcoach.ircoach.data.Settings
 import com.healthcoach.ircoach.reminders.Reminders
 import com.healthcoach.ircoach.ui.ChatScreen
 import com.healthcoach.ircoach.ui.ChatViewModel
+import com.healthcoach.ircoach.ui.CoachColors
 import com.healthcoach.ircoach.ui.CoachTheme
 import com.healthcoach.ircoach.ui.ProgressScreen
 import com.healthcoach.ircoach.ui.SettingsScreen
@@ -39,12 +43,23 @@ class MainActivity : ComponentActivity() {
             CoachTheme {
                 val vm: ChatViewModel = viewModel()
                 var tab by rememberSaveable { mutableIntStateOf(startTab) }
+                val navColors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = CoachColors.Green,
+                    selectedTextColor = CoachColors.Green,
+                    indicatorColor = CoachColors.Mint,
+                    unselectedIconColor = CoachColors.InkMuted,
+                    unselectedTextColor = CoachColors.InkMuted,
+                )
                 Scaffold(
+                    containerColor = Color.White,
                     bottomBar = {
-                        NavigationBar {
-                            NavigationBarItem(tab == 0, { tab = 0 }, { Icon(painterResource(R.drawable.ic_chat), null) }, label = { Text("Coach") })
-                            NavigationBarItem(tab == 1, { tab = 1 }, { Icon(painterResource(R.drawable.ic_chart), null) }, label = { Text("Progress") })
-                            NavigationBarItem(tab == 2, { tab = 2 }, { Icon(Icons.Filled.Settings, null) }, label = { Text("Settings") })
+                        Column {
+                            HorizontalDivider(color = CoachColors.Outline)
+                            NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
+                                NavigationBarItem(tab == 0, { tab = 0 }, { Icon(painterResource(R.drawable.ic_chat), null) }, label = { Text("Coach") }, colors = navColors)
+                                NavigationBarItem(tab == 1, { tab = 1 }, { Icon(painterResource(R.drawable.ic_chart), null) }, label = { Text("Progress") }, colors = navColors)
+                                NavigationBarItem(tab == 2, { tab = 2 }, { Icon(painterResource(R.drawable.ic_settings), null) }, label = { Text("Settings") }, colors = navColors)
+                            }
                         }
                     },
                 ) { pad ->

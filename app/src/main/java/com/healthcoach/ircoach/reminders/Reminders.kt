@@ -70,6 +70,7 @@ object Reminders {
         val plain = text.replace("*", "")
         val n = NotificationCompat.Builder(ctx, CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
+            .setColor(0xFF2E7D4F.toInt())
             .setContentTitle("IR Coach")
             .setContentText(plain)
             .setStyle(NotificationCompat.BigTextStyle().bigText(plain))

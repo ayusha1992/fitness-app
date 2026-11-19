@@ -1,3 +1,7 @@
 <resources>
-    <style name="Theme.IRCoach" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- White window behind Compose so there's no grey flash on launch. -->
+    <style name="Theme.IRCoach" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:colorAccent">#2E7D4F</item>
+    </style>
 </resources>
